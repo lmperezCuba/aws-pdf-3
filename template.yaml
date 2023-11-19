@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: |
+  aws-pdf-3
+  Sample SAM Template for aws-pdf-3
+
+Parameters:
+  PdfTempReportsBucketName:
+    Type: String
+    Default: 'lmperez-temp-pdf'
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+Resources:
+  ## S3 bucket
+  PdfTempReportsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref PdfTempReportsBucketName # pdf-temp-reports # 
+
+  ApiAGW:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      BinaryMediaTypes: ['application/pdf']
+      TracingEnabled: true
+    ## Lambda function 
+  GeneratePdfFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: generate-pdf/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Tracing: Active
+      Environment:
+        Variables:
+          POWERTOOLS_SERVICE_NAME: generatePdf
+          POWERTOOLS_METRICS_NAMESPACE: aws-pdf-3
+          LOG_LEVEL: INFO
+          PdfTempReportsBucketName: !Ref PdfTempReportsBucket
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref PdfTempReportsBucketName
+      Events:
+        GeneratePdfEvent:
+          Type: Api
+          Properties:
+            Path: /generate-pdf
+            Method: get
+            RestApiId: !Ref ApiAGW
+      MemorySize: 3008
+      Timeout: 30
+      FunctionUrlConfig:
+        AuthType: NONE
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          #- index.mts
+          - app.ts
+        External:
+          - '@aws-sdk/*'
+          - aws-sdk
+        Minify: false
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name: !Sub ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName: !Ref ApplicationResourceGroup
+      AutoConfigurationEnabled: true
+Outputs:
+  GeneratePdfApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value: !Sub https://${ApiAGW}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
+  GeneratePdfFunction:
+    Description: Generate Pdf Lambda Function ARN
+    Value: !GetAtt GeneratePdfFunction.Arn
+  GeneratePdfFunctionIamRole:
+    Description: Implicit IAM Role created for Generate Pdf function
+    Value: !GetAtt GeneratePdfFunctionRole.Arn
+  PdfTempReportsBucketName:
+    Description: Pdf Temp Reports Bucket Name
+    Value: !Ref PdfTempReportsBucket

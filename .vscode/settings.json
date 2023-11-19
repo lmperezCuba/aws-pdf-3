@@ -1,0 +1,6 @@
+{
+    "yaml.schemas": {
+        "file:///root/.vscode-server/extensions/atlassian.atlascode-3.0.3/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+        "https://json.schemastore.org/eslintrc.json": "file:///c%3A/watr/aws-pdf-3/template.yaml"
+    }
+}

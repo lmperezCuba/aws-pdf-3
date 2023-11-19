@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Mohave:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Oxygen+Mono&display=swap" rel="stylesheet"/>
+  <title>Reporte Académico - iM-PROVE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <link href="https://improve-reports-pre.s3.amazonaws.com/improve-reports-templates/student_score_detail/style.css" rel="stylesheet"/>
+</head>
+<body>
+<!-- main class: report-assessment | report-learning -->
+<main class="report-assessment">
+  <div class="page-header">
+    <div class="d-flex flex-column">
+     <img src="https://improve-reports-pre.s3.amazonaws.com/improve-reports-templates/student_score_detail/logo.svg" alt="Logo iM-PROVE" width="100">
+
+      <span class="business-tag"></span>
+    </div>
+    <div class="page-header__title">
+      <span>Reporte Académico</span>
+      <span>Resultados Evaluación {{data.assessments.[0].assessmentId}} | {{data.assessments.[0].assessmentName}}</span>
+    </div>
+  </div>
+
+  <!-- Card Alumno -->
+  <div class="card">
+    <div class="card-body flex-center-between">
+      <div>
+        <h5 class="mb-0">{{data.assessments.[0].name}} </h5>
+        <span>Resultados Evaluación {{data.assessments.[0].assessmentId}}  | {{data.assessments.[0].assessmentName}}</span>
+      </div>
+
+        <div class="overall-score" data-performance-level="2">
+        <div>Puntaje Global</div>
+        <div class="overall-score__score"><span>{{data.assessments.[0].globalScore}}</span>/500</div>
+        <div class="overall-score__tag">{{data.assessments.[0].performance}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Áreas -->
+  {{!-- <div class="card">
+    <div class="card-body area-charts">
+      <div class="area-chart" data-performance-level="1">
+        <p class="title">Matemáticas</p>
+        <div id="chart-m"></div>
+        <p class="performance-level">inicial</p>
+      </div>
+      <div class="area-chart" data-performance-level="4">
+        <p class="title">Lectura Crítica</p>
+        <div id="chart-l"></div>
+        <p class="performance-level">consolidado</p>
+      </div>
+      <div class="area-chart" data-performance-level="2">
+        <p class="title">Sociales y ciudadanas</p>
+        <div id="chart-s"></div>
+        <p class="performance-level">crecimiento</p>
+      </div>
+      <div class="area-chart" data-performance-level="3">
+        <p class="title">Ciencias naturales</p>
+        <div id="chart-c"></div>
+        <p class="performance-level">desarrollo</p>
+      </div>
+      <div class="area-chart" data-performance-level="1">
+        <p class="title">Inglés</p>
+        <div id="chart-i"></div>
+        <p class="performance-level">inicial</p>
+      </div>
+    </div>
+  </div> --}}
+
+  <h1 style="display: none" id="nombre"></h1>
+  {{!-- <p id="edad"></p>
+  <p id="ciudad"></p> --}}
+
+    <!-- Card Áreas -->
+  <div class="card">
+  <div class="card-body area-charts">
+    {{#each data.assessments.[0].areaScores}}
+      <div class="area-chart" data-performance-level={{dpls}}>
+        <p class="title">{{area}}</p>
+        <div id={{chart}}></div>
+        <p class="performance-level">{{performance}}</p>
+      </div>
+    {{/each}}
+  </div>
+</div>
+
+  <!-- Contenido Matemática -->
+  <div class="area-content">
+    <!-- Card Gráfico -->
+    <div class="card">
+      <div class="card-body">
+        <div class="area-content-header">
+          <div class="flex-center gap-2">
+            <h5 class="area-content-title">
+              <span class="iconify" data-icon="tabler:math-symbols"></span>
+               {{data.assessments.[0].areaScores.[0].area}}
+            </h5>
+          </div>
+          <div class="overall-score" data-performance-level="1">
+            <div class="overall-score__score"><span>{{data.assessments.[0].areaScores.[0].score}}</span> / 100</div>
+            <div class="overall-score__tag">{{data.assessments.[0].areaScores.[0].performance}}</div>
+          </div>
+        </div>
+        <div class="apex-chart">
+          <div id="barChart1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista Fortalezas-->    
+      <ul class="list-group">
+         <li class="list-group-item">Fortalezas con base en las respuestas correctas</li>
+         {{#each data.assessments.[0].areaScores.[0].fortalezas}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+       <br>
+    
+    <!-- Lista Recomendaciones-->    
+      <ul class="list-group">
+         <li class="list-group-item">Recomendaciones con base en las respuestas incorrectas</li>
+         {{#each data.assessments.[0].areaScores.[0].oportunidades}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+    <br>
+
+    <!-- Card Ítems -->
+    {{!-- <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ítems</h6>
+        <div class="items">
+          <div class="item green">1</div>
+          <div class="item green">2</div>
+          <div class="item green">3</div>
+          <div class="item red">4</div>
+          <div class="item green">5</div>
+          <div class="item red">6</div>
+        </div>
+      </div>
+    </div> --}}
+
+    <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ítems</h6>
+        <div class="items">
+          {{#each data.areaItems.[0].items}}
+            {{#if this.puntaje}}
+              <div class="item green">{{this.item_id}}</div>
+            {{else}}
+              <div class="item red">{{this.item_id}}</div>
+            {{/if}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Card Mejoramiento -->
+    {{!-- <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ruta de mejoramiento</h6>
+        <p>Esta es la ruta de mejoramiento que diseñamos para ti donde encontrarás masterclasses, microcon-tenidos de aprendizaje, contenidos interactivos y tests de práctica. A medida que completes las actividades se habilitaran las siguientes.</p>
+        <div class="pills">
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #3E86B7">M1</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #3E86B7">M2</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #EAA743">M3</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #EAA743">M4</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #EAA743">M5</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #866DA8">M6</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #866DA8">M8</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+        </div>
+      </div>
+    </div> --}}
+  </div>
+
+     <!-- Contenido Lectura crítica-->
+  <div class="area-content">
+    <!-- Card Gráfico -->
+    <div class="card">
+      <div class="card-body">
+        <div class="area-content-header">
+          <div class="flex-center gap-2">
+            <h5 class="area-content-title">
+              <span class="iconify" data-icon="tabler:messages"></span>
+               {{data.assessments.[0].areaScores.[1].area}}
+            </h5>
+          </div>
+          <div class="overall-score" data-performance-level="1">
+            <div class="overall-score__score"><span>{{data.assessments.[0].areaScores.[1].score}}</span> / 100</div>
+            <div class="overall-score__tag">{{data.assessments.[0].areaScores.[1].performance}}</div>
+          </div>
+        </div>
+        <div class="apex-chart">
+          <div id="barChart2"></div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Lista Fortalezas-->    
+      <ul class="list-group">
+         <li class="list-group-item">Fortalezas con base en las respuestas correctas</li>
+         {{#each data.assessments.[0].areaScores.[1].fortalezas}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+       <br>
+    
+    <!-- Lista Recomendaciones-->    
+      <ul class="list-group">
+         <li class="list-group-item">Recomendaciones con base en las respuestas incorrectas</li>
+         {{#each data.assessments.[0].areaScores.[1].oportunidades}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+      <br>
+
+    <!-- Card Ítems -->
+        <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ítems</h6>
+        <div class="items">
+          {{#each data.areaItems.[1].items}}
+            {{#if this.puntaje}}
+              <div class="item green">{{this.item_id}}</div>
+            {{else}}
+              <div class="item red">{{this.item_id}}</div>
+            {{/if}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Mejoramiento -->
+    {{!-- <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ruta de mejoramiento</h6>
+        <p>Esta es la ruta de mejoramiento que diseñamos para ti donde encontrarás masterclasses, microcon-tenidos de aprendizaje, contenidos interactivos y tests de práctica. A medida que completes las actividades se habilitaran las siguientes.</p>
+        <div class="pills">
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #3E86B7">M1</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+        </div>
+      </div>
+    </div> --}}
+  </div>
+
+          <!-- Contenido Sociales y ciudadanas-->
+  <div class="area-content">
+    <!-- Card Gráfico -->
+    <div class="card">
+      <div class="card-body">
+        <div class="area-content-header">
+          <div class="flex-center gap-2">
+            <h5 class="area-content-title">
+              <span class="iconify" data-icon="tabler:messages"></span>
+               {{data.assessments.[0].areaScores.[2].area}}
+            </h5>
+          </div>
+          <div class="overall-score" data-performance-level="1">
+            <div class="overall-score__score"><span>{{data.assessments.[0].areaScores.[2].score}}</span> / 100</div>
+            <div class="overall-score__tag">{{data.assessments.[0].areaScores.[2].performance}}</div>
+          </div>
+        </div>
+        <div class="apex-chart">
+          <div id="barChart3"></div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Lista Fortalezas-->    
+      <ul class="list-group">
+         <li class="list-group-item">Fortalezas con base en las respuestas correctas</li>
+         {{#each data.assessments.[0].areaScores.[2].fortalezas}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+       <br>
+    
+    <!-- Lista Recomendaciones-->    
+      <ul class="list-group">
+         <li class="list-group-item">Recomendaciones con base en las respuestas incorrectas</li>
+         {{#each data.assessments.[0].areaScores.[2].oportunidades}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+      <br>
+
+    <!-- Card Ítems -->
+        <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ítems</h6>
+        <div class="items">
+          {{#each data.areaItems.[2].items}}
+            {{#if this.puntaje}}
+              <div class="item green">{{this.item_id}}</div>
+            {{else}}
+              <div class="item red">{{this.item_id}}</div>
+            {{/if}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Mejoramiento -->
+    {{!-- <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ruta de mejoramiento</h6>
+        <p>Esta es la ruta de mejoramiento que diseñamos para ti donde encontrarás masterclasses, microcon-tenidos de aprendizaje, contenidos interactivos y tests de práctica. A medida que completes las actividades se habilitaran las siguientes.</p>
+        <div class="pills">
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #3E86B7">M1</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+        </div>
+      </div>
+    </div> --}}
+  </div>
+
+       <!-- Contenido Ciencias naturales-->
+  <div class="area-content">
+    <!-- Card Gráfico -->
+    <div class="card">
+      <div class="card-body">
+        <div class="area-content-header">
+          <div class="flex-center gap-2">
+            <h5 class="area-content-title">
+              <span class="iconify" data-icon="tabler:messages"></span>
+               {{data.assessments.[0].areaScores.[3].area}}
+            </h5>
+          </div>
+          <div class="overall-score" data-performance-level="1">
+            <div class="overall-score__score"><span>{{data.assessments.[0].areaScores.[3].score}}</span> / 100</div>
+            <div class="overall-score__tag">{{data.assessments.[0].areaScores.[3].performance}}</div>
+          </div>
+        </div>
+        <div class="apex-chart">
+          <div id="barChart4"></div>
+        </div>
+      </div>
+    </div>
+
+       <!-- Lista Fortalezas-->    
+      <ul class="list-group">
+         <li class="list-group-item">Fortalezas con base en las respuestas correctas</li>
+         {{#each data.assessments.[0].areaScores.[3].fortalezas}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+       <br>
+    
+    <!-- Lista Recomendaciones-->    
+      <ul class="list-group">
+         <li class="list-group-item">Recomendaciones con base en las respuestas incorrectas</li>
+         {{#each data.assessments.[0].areaScores.[3].oportunidades}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+      <br>
+
+    <!-- Card Ítems -->
+        <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ítems</h6>
+        <div class="items">
+          {{#each data.areaItems.[3].items}}
+            {{#if this.puntaje}}
+              <div class="item green">{{this.item_id}}</div>
+            {{else}}
+              <div class="item red">{{this.item_id}}</div>
+            {{/if}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Mejoramiento -->
+    {{!-- <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ruta de mejoramiento</h6>
+        <p>Esta es la ruta de mejoramiento que diseñamos para ti donde encontrarás masterclasses, microcon-tenidos de aprendizaje, contenidos interactivos y tests de práctica. A medida que completes las actividades se habilitaran las siguientes.</p>
+        <div class="pills">
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #3E86B7">M1</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+        </div>
+      </div>
+    </div> --}}
+  </div>
+
+  <!-- Contenido Ingles-->
+  <div class="area-content">
+    <!-- Card Gráfico -->
+    <div class="card">
+      <div class="card-body">
+        <div class="area-content-header">
+          <div class="flex-center gap-2">
+            <h5 class="area-content-title">
+              <span class="iconify" data-icon="tabler:messages"></span>
+               {{data.assessments.[0].areaScores.[4].area}}
+            </h5>
+          </div>
+          <div class="overall-score" data-performance-level="1">
+            <div class="overall-score__score"><span>{{data.assessments.[0].areaScores.[4].score}}</span> / 100</div>
+            <div class="overall-score__tag">{{data.assessments.[0].areaScores.[4].performance}}</div>
+          </div>
+        </div>
+        <div class="apex-chart">
+          <div id="barChart5"></div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Lista Fortalezas-->    
+      <ul class="list-group">
+         <li class="list-group-item">Fortalezas con base en las respuestas correctas</li>
+         {{#each data.assessments.[0].areaScores.[4].fortalezas}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+       <br>
+    
+    <!-- Lista Recomendaciones-->    
+      <ul class="list-group">
+         <li class="list-group-item">Recomendaciones con base en las respuestas incorrectas</li>
+         {{#each data.assessments.[0].areaScores.[4].oportunidades}}
+         <li class="list-group-item">{{this}}</li>
+         {{/each}}
+      </ul>
+
+    <br>
+  <!-- Card Ítems -->
+        <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ítems</h6>
+        <div class="items">
+          {{#each data.areaItems.[4].items}}
+            {{#if this.puntaje}}
+              <div class="item green">{{this.item_id}}</div>
+            {{else}}
+              <div class="item red">{{this.item_id}}</div>
+            {{/if}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Mejoramiento -->
+    {{!-- <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Ruta de mejoramiento</h6>
+        <p>Esta es la ruta de mejoramiento que diseñamos para ti donde encontrarás masterclasses, microcon-tenidos de aprendizaje, contenidos interactivos y tests de práctica. A medida que completes las actividades se habilitaran las siguientes.</p>
+        <div class="pills">
+          <div class="pill-wrapper">
+            <div class="pill" style="background-color: #3E86B7">M1</div>
+            Lorem ipsum dolor sit amet consectetur. Elementum nisl laoreet nulla id euismod. Felis tristique egestas molestie purus pulvinar blandit. Odio ultricies mattis dictum tristique ut.
+          </div>
+        </div>
+      </div>
+    </div> --}}
+  </div>
+
+
+  <div style="display: none;" id="groups">{{groups}} </div>
+  <div style="display: none;" id="series">{{series}} </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+
+<!-- Apex Percentage chart -->
+<script>
+
+   document.getElementById('nombre').textContent = document.getElementById('groups').textContent;
+
+  const optionsRadialBar = {
+    chart: {
+      type: "radialBar",
+      height: 80,
+      fontFamily: "Inter, sans-serif"
+    },
+    colors: [
+      function ({ value }) {
+        if (value > 80) {
+          return "#1DC7B4"
+        } else if (value >= 60) {
+          return "#275BE0"
+        } else if (value >= 40) {
+          return "#B65DD6"
+        } else {
+          return "#FD6915"
+        }
+      }
+    ],
+    plotOptions: {
+      radialBar: {
+        offsetY: -8,
+        startAngle: -130,
+        endAngle: 130,
+        hollow: {
+          size: "55%"
+        },
+        track: {
+          background: "#EBEBEB",
+          strokeWidth: "90%"
+        },
+        dataLabels: {
+          name: {
+            show: false
+          },
+          value: {
+            color: "#5e5873",
+            fontFamily: "Inter",
+            fontSize: "14px",
+            fontWeight: "500",
+            offsetY: 6,
+            formatter (val) {
+              return `${val}`
+            }
+          }
+        }
+      }
+    },
+    stroke: {
+      lineCap: "round"
+    },
+    grid: {
+      padding: { left: 0, right: 0, top: 0, bottom: 0 }
+    }
+  }
+
+
+ const charts = ["#chart-m", "#chart-l", "#chart-s", "#chart-c", "#chart-i"];
+ //const seriesData = [9, 99, 45, 68, 15];
+ const seriesData = [{{data.assessments.[0].areaScores.[0].score}} , {{data.assessments.[0].areaScores.[1].score}}, {{data.assessments.[0].areaScores.[2].score}}, {{data.assessments.[0].areaScores.[3].score}}, {{data.assessments.[0].areaScores.[4].score}}];
+
+for (let i = 0; i < charts.length; i++) {
+  let optionsChart = { ...optionsRadialBar };
+  optionsChart.series = [seriesData[i]];
+  new ApexCharts(document.querySelector(charts[i]), optionsChart).render();
+}
+
+</script>
+
+
+
+<!-- Apex Bar chart -->
+<script>
+  const mapAreas = [ '', 'Matemáticas', 'Lectura crítica', 'Sociales y ciudadanas', 'Ciencias naturales', 'Inglés' ]
+  const groups = JSON.parse(document.getElementById('groups').textContent)
+  const series = JSON.parse(document.getElementById('series').textContent)
+  for(let i = 1; i <= 5; i++) {
+      const optionsBar = {
+    chart: {
+      type: "bar",
+      height: 350,
+      fontFamily: "Inter, sans-serif",
+      toolbar: {
+        show: false
+      }
+    },
+    plotOptions: {
+      bar: {
+        columnWidth: "60%"
+      }
+    },
+    title: {
+      text: "Gráfico por componentes y competencias",
+      align: "left",
+      margin: 0,
+      floating: false,
+      style: {
+        fontSize: "15px",
+        fontWeight: 500,
+        color: "#263238"
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    legend: {
+      showForSingleSeries: true,
+      customLegendItems: ["Alumno", "Curso"],
+      position: "top",
+      horizontalAlign: "right",
+      markers: {
+        fillColors: ["#C5DFE4", "#3F55AA"],
+        width: 12,
+        height: 12,
+        radius: 12
+      }
+    },
+    colors: ["#C5DFE4"],
+    xaxis: {
+      type: "category",
+      group: {
+        style: {
+          fontSize: "10px",
+          fontWeight: 600
+        },
+        groups: groups[mapAreas[i]]
+      },
+      labels: {
+        // rotate: 0,
+        trim: true,
+        style: {
+          fontSize: "10px"
+        },
+      }
+    },
+    yaxis: {
+      min: 0,
+      max: 500,
+      tickAmount: 5
+    },
+    series: series[mapAreas[i]]
+  } 
+  new ApexCharts(document.querySelector(`#barChart${i}`), optionsBar).render();
+  }
+
+</script>
+</body>
+</html>
